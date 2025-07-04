@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="4.0" type="file" method="upgrade">
+    <name>Duitku Payment Plugin for JoomShopping</name>
+    <version>1.0.0</version>
+    <creationDate>July 2025</creationDate>
+    <author>Duitku Payment Gateway</author>
+    <authorEmail>support@duitku.com</authorEmail>
+    <authorUrl>https://duitku.com</authorUrl>
+    <copyright>Copyright (C) 2025. All rights reserved.</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <description>Duitku Payment Gateway integration for JoomShopping. Supports multiple payment methods through Duitku's secure payment platform.</description>
+    
+    <fileset>
+        <files target="components/com_jshopping/payments/pm_duitku">
+            <file>pm_duitku.php</file>
+            <file>adminparamsform.php</file>
+            <file>callback.php</file>
+            <file>paymentform.php</file>
+            <folder>duitku-php</folder>
+        </files>
+    </fileset>
+    
+    <scriptfile>install.php</scriptfile>
+    
+    <updateservers>
+        <server type="extension" priority="1" name="Duitku Payment Plugin Updates">
+            <![CDATA[https://updates.duitku.com/joomshopping/pm_duitku.xml]]>
+        </server>
+    </updateservers>
+</extension>

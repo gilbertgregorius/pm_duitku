@@ -1,0 +1,8 @@
+# Duitku JoomShopping Payment Plugin
+
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
