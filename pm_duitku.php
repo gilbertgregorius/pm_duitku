@@ -99,13 +99,17 @@ class pm_duitku extends PaymentRoot
 
         $uri = Uri::getInstance();
         $liveurlhost = $uri->toString(array("scheme", 'host', 'port'));
-        
+
+        // Get the base path from the current request
+        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+        if ($basePath === '/') $basePath = '';
+
         // Use development URL if development mode is enabled
         if (!empty($pmconfigs['devMode']) && !empty($pmconfigs['devUrl'])) {
             $liveurlhost = rtrim($pmconfigs['devUrl'], '/');
             Helper::saveToLog("duitku_debug.log", "Development mode enabled - Using URL: " . $liveurlhost);
         }
-        
+
         $params = array(
             'merchantCode' => $merchantcode,
             'paymentAmount' => intval($amount),
@@ -114,8 +118,8 @@ class pm_duitku extends PaymentRoot
             'productDetails' => 'Order : ' . $ordernumber,
             'additionalParam' => '',
             'merchantUserInfo' => $merchantUserInfo,
-            'callbackUrl' => $liveurlhost . "/components/com_jshopping/payments/pm_duitku/callback.php?js_paymentclass=".$pm_method->payment_class."&custom=".$orderId,
-            'returnUrl' => $liveurlhost . Helper::SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&custom=" . $orderId . "&js_paymentclass=" . $pm_method->payment_class),
+            'callbackUrl' => $liveurlhost . $basePath . "/components/com_jshopping/payments/pm_duitku/callback.php?js_paymentclass=" . $pm_method->payment_class . "&custom=" . $orderId,
+            'returnUrl' => $liveurlhost . $basePath . Helper::SEFLink("index.php?option=com_jshopping&controller=checkout&task=step7&act=return&custom=" . $orderId . "&js_paymentclass=" . $pm_method->payment_class),
             'signature' => $signature,
         );
 

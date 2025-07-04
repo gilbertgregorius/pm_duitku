@@ -15,8 +15,24 @@ file_put_contents(__DIR__ . '/../../../../components/com_jshopping/log/duitku_ca
 $paymentClass = $_GET['js_paymentclass'] ?? $_POST['js_paymentclass'] ?? 'pm_duitku';
 $customId = $_GET['custom'] ?? $_POST['custom'] ?? '';
 
+// Get the current domain and path from the request
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+// Extract the base path (go up 4 levels from /path/components/com_jshopping/payments/duitku-payment-plugin-origin/callback.php)
+$basePath = dirname(dirname(dirname(dirname(dirname($requestUri)))));
+if ($basePath === '/') $basePath = '';
+
 // Build the JoomShopping notification URL
-$notifyUrl = 'http://localhost:8888/Joomla_5.3.1-Stable-Full_Package/index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=' . $paymentClass . '&custom=' . $customId . '&no_lang=1';
+$notifyUrl = $protocol . $host . $basePath . '/index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=' . $paymentClass . '&custom=' . $customId . '&no_lang=1';
+
+// Log the detected paths for debugging
+file_put_contents(
+    __DIR__ . '/../../../../components/com_jshopping/log/duitku_callback.log',
+    "DEBUG: requestUri=$requestUri, basePath=$basePath, notifyUrl=$notifyUrl\n",
+    FILE_APPEND
+);
 
 // Prepare POST data with all Duitku parameters
 $postData = array_merge($_GET, $_POST);
