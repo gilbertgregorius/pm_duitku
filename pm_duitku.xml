@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="4.0" type="file" method="upgrade">
     <name>Duitku Payment Plugin for JoomShopping</name>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <creationDate>July 2025</creationDate>
     <author>Duitku Payment Gateway</author>
     <authorEmail>support@duitku.com</authorEmail>
