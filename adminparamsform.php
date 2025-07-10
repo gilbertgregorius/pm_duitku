@@ -19,59 +19,31 @@ defined('_JEXEC') or die('Restricted access');
       </tr>
       <tr>
         <td class="key">
-          <?php echo 'Secret Key'; ?>
+          <?php echo 'API Key'; ?>
         </td>
         <td>
-          <input type="text" class="inputbox form-control" name="pm_params[secretKey]" size="45" value="<?php echo htmlspecialchars($params['secretKey']); ?>" />
+          <input type="text" class="inputbox form-control" name="pm_params[apiKey]" size="45" value="<?php echo htmlspecialchars($params['apiKey']); ?>" />
         </td>
       </tr>
       <tr>
         <td class="key">
-          <?php echo 'URL Redirect'; ?>
+          <?php echo 'Environment'; ?>
         </td>
         <td>
-          <select name="pm_params[urlRedirect]" class="inputbox custom-select">
-            <option value="https://sandbox.duitku.com/webapi" <?php if ($params['urlRedirect'] == 'https://sandbox.duitku.com/webapi') echo "selected"; ?>>Sandbox</option>
-            <option value="https://passport.duitku.com/webapi" <?php if ($params['urlRedirect'] == 'https://passport.duitku.com/webapi') echo "selected"; ?>>Production</option>
+          <select name="pm_params[environment]" id="environment" class="inputbox custom-select">
+            <option value="sandbox" <?php if (isset($params['environment']) && $params['environment'] == 'sandbox') echo "selected";
+                                    elseif (!isset($params['environment'])) echo "selected"; ?>>Sandbox (Testing)</option>
+            <option value="production" <?php if (isset($params['environment']) && $params['environment'] == 'production') echo "selected"; ?>>Production (Live)</option>
           </select>
         </td>
       </tr>
-      <tr>
-        <td class="key">
-          <?php echo 'Payment Method'; ?>
-        </td>
-        <td>
-          <select id="paymentTypeId" name="pm_params[paymentMethod]" class="inputbox custom-select">
-            <option value="VC" <?php if ($params['paymentMethod'] == 'VC') echo "selected"; ?>>Credit Card</option>
-            <option value="BK" <?php if ($params['paymentMethod'] == 'BK') echo "selected"; ?>>BCA Klikpay</option>
-            <option value="MY" <?php if ($params['paymentMethod'] == 'MY') echo "selected"; ?>>Mandiri Clickpay</option>
-            <option value="CK" <?php if ($params['paymentMethod'] == 'CK') echo "selected"; ?>>Cimb clicks</option>
-            <option value="BT" <?php if ($params['paymentMethod'] == 'BT') echo "selected"; ?>>VA Permata</option>
-            <option value="A1" <?php if ($params['paymentMethod'] == 'A1') echo "selected"; ?>>VA ATM Bersama</option>
-            <option value="I1" <?php if ($params['paymentMethod'] == 'I1') echo "selected"; ?>>VA BNI</option>
-            <option value="B1" <?php if ($params['paymentMethod'] == 'B1') echo "selected"; ?>>VA CIMB</option>
-            <option value="VA" <?php if ($params['paymentMethod'] == 'VA') echo "selected"; ?>>VA Maybank</option>
-            <option value="FT" <?php if ($params['paymentMethod'] == 'FT') echo "selected"; ?>>Ritel</option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td class="key">
-          <?php echo 'Development Mode'; ?>
-        </td>
-        <td>
-          <input type="checkbox" id="devMode" name="pm_params[devMode]" value="1" <?php if (!empty($params['devMode'])) echo 'checked="checked"'; ?> />
-          <label for="devMode">Enable for local development testing</label>
-          <br><small>When enabled, use custom URL for callbacks instead of auto-detected domain</small>
-        </td>
-      </tr>
-      <tr id="devUrlRow" style="<?php echo !empty($params['devMode']) ? '' : 'display:none;'; ?>">
+      <tr id="devUrlRow" style="<?php echo (!isset($params['environment']) || $params['environment'] == 'sandbox') ? '' : 'display:none;'; ?>">
         <td class="key">
           <?php echo 'Development URL'; ?>
         </td>
         <td>
           <input type="text" class="inputbox form-control" name="pm_params[devUrl]" id="devUrl" size="50" value="<?php echo htmlspecialchars($params['devUrl']); ?>" placeholder="https://abc123.ngrok.io" />
-          <br><small>Your ngrok or tunnel URL (e.g., https://abc123.ngrok.io) - no trailing slash</small>
+          <br><small>Your ngrok or tunnel URL for local development (e.g., https://abc123.ngrok.io) - no trailing slash</small>
         </td>
       </tr>
       <tr>
@@ -102,14 +74,22 @@ defined('_JEXEC') or die('Restricted access');
 <div class="clr"></div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const devModeCheckbox = document.getElementById('devMode');
+  document.addEventListener('DOMContentLoaded', function() {
+    const environmentSelect = document.getElementById('environment');
     const devUrlRow = document.getElementById('devUrlRow');
-    
-    if (devModeCheckbox) {
-        devModeCheckbox.addEventListener('change', function() {
-            devUrlRow.style.display = this.checked ? '' : 'none';
-        });
+
+    if (environmentSelect && devUrlRow) {
+      // Function to toggle development URL visibility
+      function toggleDevUrl() {
+        const isProduction = environmentSelect.value === 'production';
+        devUrlRow.style.display = isProduction ? 'none' : '';
+      }
+
+      // Set initial state
+      toggleDevUrl();
+
+      // Listen for changes
+      environmentSelect.addEventListener('change', toggleDevUrl);
     }
-});
+  });
 </script>

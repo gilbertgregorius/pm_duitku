@@ -25,9 +25,11 @@ $basePath = dirname(dirname(dirname(dirname(dirname($requestUri)))));
 if ($basePath === '/') $basePath = '';
 
 // Build the JoomShopping notification URL
-$notifyUrl = $protocol . $host . $basePath . '/index.php?option=com_jshopping&controller=checkout&task=step7&act=notify&js_paymentclass=' . $paymentClass . '&custom=' . $customId . '&no_lang=1';
+$notifyUrl = $protocol . $host . $basePath . 
+            '/index.php?option=com_jshopping&controller=checkout&task=step7' . 
+            '&act=notify&js_paymentclass=' . $paymentClass . 
+            '&custom=' . $customId . '&no_lang=1';
 
-// Log the detected paths for debugging
 file_put_contents(
     __DIR__ . '/../../../../components/com_jshopping/log/duitku_callback.log',
     "DEBUG: requestUri=$requestUri, basePath=$basePath, notifyUrl=$notifyUrl\n",

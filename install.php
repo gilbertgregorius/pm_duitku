@@ -46,10 +46,10 @@ class PlgSystemPm_duitkuInstallerScript
                 ->columns('payment_class, payment_type, payment_publish, payment_ordering, payment_params, payment_code')
                 ->values(
                     $db->quote('pm_duitku') . ', ' .
+                        '2, ' .
                         '1, ' .
                         '1, ' .
-                        '1, ' .
-                        $db->quote('{"merchantCode":"","secretKey":"","urlRedirect":"https://passport.duitku.com/webapi","paymentMethod":"","transaction_end_status":"C","transaction_failed_status":"P","address_override":0,"devMode":0,"devUrl":""}') . ', ' .
+                        $db->quote('{"merchantCode":"","apiKey":"","environment":"sandbox","paymentMethod":"","transaction_end_status":"C","transaction_failed_status":"P","address_override":0,"devUrl":""}') . ', ' .
                         $db->quote('DUITKU')
                 );
 
@@ -66,37 +66,37 @@ class PlgSystemPm_duitkuInstallerScript
     public function uninstall($parent)
     {
         $db = Factory::getDbo();
-        
+
         try {
             // Get payment method ID first
             $query = $db->getQuery(true);
             $query->select('payment_id')
-                  ->from('#__jshopping_payment_method')
-                  ->where('payment_class = ' . $db->quote('pm_duitku'));
-            
+                ->from('#__jshopping_payment_method')
+                ->where('payment_class = ' . $db->quote('pm_duitku'));
+
             $db->setQuery($query);
             $paymentId = $db->loadResult();
-            
+
             if ($paymentId) {
                 // Check if payment method is used in any orders
                 $query = $db->getQuery(true);
                 $query->select('COUNT(*)')
-                      ->from('#__jshopping_orders')
-                      ->where('payment_method_id = ' . (int)$paymentId);
-                
+                    ->from('#__jshopping_orders')
+                    ->where('payment_method_id = ' . (int)$paymentId);
+
                 $db->setQuery($query);
                 $ordersCount = (int)$db->loadResult();
-                
+
                 if ($ordersCount > 0) {
                     // Don't delete if orders exist, just disable
                     $query = $db->getQuery(true);
                     $query->update('#__jshopping_payment_method')
-                          ->set('payment_publish = 0')
-                          ->where('payment_id = ' . (int)$paymentId);
-                    
+                        ->set('payment_publish = 0')
+                        ->where('payment_id = ' . (int)$paymentId);
+
                     $db->setQuery($query);
                     $db->execute();
-                    
+
                     Factory::getApplication()->enqueueMessage(
                         'Duitku Payment Plugin disabled (not deleted) because it has been used in ' . $ordersCount . ' orders.',
                         'info'
@@ -105,21 +105,21 @@ class PlgSystemPm_duitkuInstallerScript
                     // Safe to delete
                     $query = $db->getQuery(true);
                     $query->delete('#__jshopping_payment_method')
-                          ->where('payment_id = ' . (int)$paymentId);
-                    
+                        ->where('payment_id = ' . (int)$paymentId);
+
                     $db->setQuery($query);
                     $db->execute();
-                    
+
                     Factory::getApplication()->enqueueMessage('Duitku Payment Plugin removed from database.', 'message');
                 }
             }
-            
+
             // Clean up log files
             $logFiles = [
                 JPATH_ROOT . '/components/com_jshopping/log/duitku_debug.log',
                 JPATH_ROOT . '/components/com_jshopping/log/duitku_callback.log'
             ];
-            
+
             foreach ($logFiles as $logFile) {
                 if (file_exists($logFile)) {
                     unlink($logFile);
@@ -132,13 +132,12 @@ class PlgSystemPm_duitkuInstallerScript
                 $this->removeDirectory($targetDir);
                 Factory::getApplication()->enqueueMessage('Plugin files removed successfully!', 'message');
             }
-            
+
             Factory::getApplication()->enqueueMessage('Duitku Payment Plugin uninstalled successfully!', 'message');
-            
         } catch (Exception $e) {
             Factory::getApplication()->enqueueMessage('Error during uninstallation: ' . $e->getMessage(), 'error');
         }
-        
+
         return true;
     }
 
@@ -147,7 +146,7 @@ class PlgSystemPm_duitkuInstallerScript
         Factory::getApplication()->enqueueMessage('Duitku Payment Plugin updated successfully!', 'message');
         return true;
     }
-    
+
     public function preflight($type, $parent)
     {
         // Check minimum requirements
@@ -155,10 +154,10 @@ class PlgSystemPm_duitkuInstallerScript
             Factory::getApplication()->enqueueMessage('This plugin requires PHP 7.4 or higher.', 'error');
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Helper method to recursively remove a directory
      */
@@ -167,9 +166,9 @@ class PlgSystemPm_duitkuInstallerScript
         if (!is_dir($dir)) {
             return false;
         }
-        
+
         $files = array_diff(scandir($dir), array('.', '..'));
-        
+
         foreach ($files as $file) {
             $path = $dir . '/' . $file;
             if (is_dir($path)) {
@@ -178,10 +177,10 @@ class PlgSystemPm_duitkuInstallerScript
                 unlink($path);
             }
         }
-        
+
         return rmdir($dir);
     }
-    
+
     /**
      * Helper method to recursively copy a directory
      */
@@ -190,24 +189,24 @@ class PlgSystemPm_duitkuInstallerScript
         if (!is_dir($source)) {
             return false;
         }
-        
+
         if (!is_dir($destination)) {
             mkdir($destination, 0755, true);
         }
-        
+
         $files = array_diff(scandir($source), array('.', '..'));
-        
+
         foreach ($files as $file) {
             $sourcePath = $source . '/' . $file;
             $destPath = $destination . '/' . $file;
-            
+
             if (is_dir($sourcePath)) {
                 $this->copyDirectory($sourcePath, $destPath);
             } else {
                 copy($sourcePath, $destPath);
             }
         }
-        
+
         return true;
     }
 }

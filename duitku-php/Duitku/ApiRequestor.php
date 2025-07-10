@@ -1,55 +1,54 @@
 <?php
 
-class Duitku_ApiRequestor {
+class Duitku_ApiRequestor
+{
 
-  public static function get($url, $data_hash)
+  public static function get($url, $data_hash, $headers = [])
   {
-    return self::remoteCall($url, $data_hash, false);
+    return self::remoteCall($url, $data_hash, false, $headers);
   }
 
-  public static function post($url, $data_hash)
+  public static function post($url, $data_hash, $headers = [])
   {
-    return self::remoteCall($url, $data_hash, true);
+    return self::remoteCall($url, $data_hash, true, $headers);
   }
 
-  public static function remoteCall($url, $data_hash, $post = true)
+  public static function remoteCall($url, $data_hash, $post = true, $headers = [])
   {
     $ch = curl_init();
+    $httpHeaders = [];
 
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'Accept: application/json',        
-      ));
+
+    foreach ($headers as $key => $value) {
+      $httpHeaders[] = $key . ': ' . $value;
+    }
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeaders);
+    
 
     if ($post) {
       curl_setopt($ch, CURLOPT_POST, 1);
-
       if ($data_hash) {
         $body = json_encode($data_hash);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-      }
-      else {
+      } else {
         curl_setopt($ch, CURLOPT_POSTFIELDS, '');
       }
     }
 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
     $result = curl_exec($ch);
-    //curl_close($ch);
 
     if ($result === FALSE) {
       throw new Exception('CURL Error: ' . curl_error($ch), curl_errno($ch));
-    }
-    else {
+    } else {
       $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
       $result_array = json_decode($result);
       if ($httpcode != 200) {
-        $message = $result;            
+        $message = $result;
         throw new Exception($message, $httpcode);
-      }
-      else {
+      } else {
         return $result_array;
       }
     }

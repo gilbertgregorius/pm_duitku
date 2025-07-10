@@ -1,18 +1,61 @@
 <?php
 
-class Duitku_Config {
+defined('_JEXEC') or die('Restricted access');
 
-  public static $serverKey;
-  public static $apiVersion = 2;
-  public static $isProduction = false;  
-  public static $isSanitized = true;
+/**
+ * Duitku Payment Plugin Configuration
+ * Centralized configuration for API URLs and environment settings
+ */
+class DuitkuConfig
+{
+    /**
+     * Get API configuration based on environment
+     * 
+     * @param string $environment 'sandbox' or 'production'
+     * @return array Configuration array with baseUrl and apiUrl
+     */
+    public static function getUrl($environment = 'sandbox')
+    {
+        $configs = [
+            'sandbox' => 'https://api-sandbox.duitku.com/api/merchant/createInvoice',
+            'production' => 'https://api-prod.duitku.com/api/merchant/createInvoice'
+        ];
 
-  const SANDBOX_BASE_URL = 'http://182.23.85.10/rbsnewwebapi/';
-  const PRODUCTION_BASE_URL = 'https://api.veritrans.co.id/v2';
+        return isset($configs[$environment]) ? $configs[$environment] : $configs['sandbox'];
+    }
 
-  public static function getBaseUrl()
-  {
-    return Duitku_Config::$isProduction ?
-        Duitku_Config::PRODUCTION_BASE_URL : Duitku_Config::SANDBOX_BASE_URL;
-  }
+    /**
+     * Check if environment is production
+     * 
+     * @param string $environment
+     * @return bool
+     */
+    public static function isProduction($environment)
+    {
+        return $environment === 'production';
+    }
+
+    /**
+     * Get available environments
+     * 
+     * @return array
+     */
+    public static function getEnvironments()
+    {
+        return [
+            'sandbox' => 'Sandbox (Testing)',
+            'production' => 'Production (Live)'
+        ];
+    }
+
+    /**
+     * Validate environment string
+     * 
+     * @param string $environment
+     * @return string Valid environment string
+     */
+    public static function validateEnvironment($environment)
+    {
+        return in_array($environment, ['sandbox', 'production']) ? $environment : 'sandbox';
+    }
 }
