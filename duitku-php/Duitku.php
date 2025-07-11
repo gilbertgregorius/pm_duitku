@@ -11,8 +11,8 @@ if (!function_exists('json_decode')) {
   throw new Exception('Duitku needs the JSON PHP extension.');
 }
 
-require_once('Duitku/Config.php');
 require_once('Duitku/ApiRequestor.php');
+require_once('Duitku/Config.php');
+require_once('Duitku/DuitkuPop.php');
 require_once('Duitku/HeaderGenerator.php');
 require_once('Duitku/Notification.php');
-require_once('Duitku/Pop.php');

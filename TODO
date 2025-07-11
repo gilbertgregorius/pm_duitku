@@ -1,7 +1,0 @@
-Todo:
-    ☐ Semua metode pembayaran & testing
-    ☐ Life cycle
-        ☐ uninstall
-        ☐ test kolom alias (prefix aja ato penting) ; payment list
-        ☐ test kolom code ; payment list
-        ☐ update ke POP API, biar pm fleksibel dan ga harus insert manual satu"
