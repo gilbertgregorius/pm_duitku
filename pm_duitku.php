@@ -2,6 +2,7 @@
 
 use Joomla\Component\Jshopping\Site\Lib\JSFactory;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Help\Help;
 use Joomla\Component\Jshopping\Site\Helper\Helper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
@@ -24,7 +25,6 @@ class pm_duitku extends PaymentRoot
         include(dirname(__FILE__) . "/paymentform.php");
     }
 
-    //function call in admin
     function showAdminFormParams($params)
     {
         $array_params = array('merchantCode', 'apiKey', 'environment', 'paymentMethod', 'transaction_end_status', 'transaction_failed_status', 'devUrl');
@@ -32,13 +32,13 @@ class pm_duitku extends PaymentRoot
         foreach ($array_params as $key) {
             if (!isset($params[$key])) $params[$key] = '';
         }
-        // Set default environment to sandbox if not set
+
         if (!isset($params['environment']) || empty($params['environment'])) {
             $params['environment'] = 'sandbox';
         }
         if (!isset($params['address_override'])) $params['address_override'] = 0;
 
-        $orders = JSFactory::getModel('orders'); //admin model
+        $orders = JSFactory::getModel('orders');
         include(dirname(__FILE__) . "/adminparamsform.php");
     }
 
@@ -89,6 +89,8 @@ class pm_duitku extends PaymentRoot
     function showEndForm($pmconfigs, $order)
     {
         Helper::saveToLog("duitku_debug.log", "=== showEndForm called - Order ID: " . $order->order_id . ", Order Number: " . $order->order_number . " ===");
+        Helper::saveToLog("duitku_debug.log", "Payment method configs: " . print_r($pmconfigs, true));
+        Helper::saveToLog("duitku_debug.log", "Order details: " . print_r($order, true));
 
         $pm_method = $this->getPmMethod();
         $amount = $this->fixOrderTotal($order);
@@ -148,7 +150,7 @@ class pm_duitku extends PaymentRoot
 
     function getUrlParams($pmconfigs)
     {
-        Helper::saveToLog("duitku_debug.log", "getUrlParams called");
+        Helper::saveToLog("duitku_debug.log", "=== getUrlParams called ===");
 
         $input = Factory::getApplication()->input;
         $params = array();
@@ -158,6 +160,7 @@ class pm_duitku extends PaymentRoot
         $params['checkReturnParams'] = 0;
 
         Helper::saveToLog("duitku_debug.log", "getUrlParams returning: " . print_r($params, true));
+        Helper::saveToLog("duitku_debug.log", "Input data: " . print_r($input->getArray(), true));
 
         return $params;
     }
